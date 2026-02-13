@@ -8,6 +8,7 @@
 
 /* Begin PBXFileReference section */
 		D5E98B232F3FB5D900EE3FE7 /* Blackjack 2D.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Blackjack 2D.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5E98C012F3FCA0000EE3FE7 /* Blackjack 2DTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Blackjack 2DTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +17,32 @@
 			path = "Blackjack 2D";
 			sourceTree = "<group>";
 		};
+		D5E98C022F3FCA0000EE3FE7 /* Blackjack 2DTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Blackjack 2DTests";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		D5E98C072F3FCA0000EE3FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D5E98B1B2F3FB5D900EE3FE7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D5E98B222F3FB5D900EE3FE7;
+			remoteInfo = "Blackjack 2D";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		D5E98B202F3FB5D900EE3FE7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D5E98C032F3FCA0000EE3FE7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				D5E98B252F3FB5D900EE3FE7 /* Blackjack 2D */,
+				D5E98C022F3FCA0000EE3FE7 /* Blackjack 2DTests */,
 				D5E98B242F3FB5D900EE3FE7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				D5E98B232F3FB5D900EE3FE7 /* Blackjack 2D.app */,
+				D5E98C012F3FCA0000EE3FE7 /* Blackjack 2DTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +95,29 @@
 			productReference = D5E98B232F3FB5D900EE3FE7 /* Blackjack 2D.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D5E98C062F3FCA0000EE3FE7 /* Blackjack 2DTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D5E98C0B2F3FCA0000EE3FE7 /* Build configuration list for PBXNativeTarget "Blackjack 2DTests" */;
+			buildPhases = (
+				D5E98C042F3FCA0000EE3FE7 /* Sources */,
+				D5E98C032F3FCA0000EE3FE7 /* Frameworks */,
+				D5E98C052F3FCA0000EE3FE7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D5E98C082F3FCA0000EE3FE7 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D5E98C022F3FCA0000EE3FE7 /* Blackjack 2DTests */,
+			);
+			name = "Blackjack 2DTests";
+			packageProductDependencies = (
+			);
+			productName = "Blackjack 2DTests";
+			productReference = D5E98C012F3FCA0000EE3FE7 /* Blackjack 2DTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -82,6 +130,10 @@
 				TargetAttributes = {
 					D5E98B222F3FB5D900EE3FE7 = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					D5E98C062F3FCA0000EE3FE7 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = D5E98B222F3FB5D900EE3FE7;
 					};
 				};
 			};
@@ -100,12 +152,20 @@
 			projectRoot = "";
 			targets = (
 				D5E98B222F3FB5D900EE3FE7 /* Blackjack 2D */,
+				D5E98C062F3FCA0000EE3FE7 /* Blackjack 2DTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		D5E98B212F3FB5D900EE3FE7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D5E98C052F3FCA0000EE3FE7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +182,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D5E98C042F3FCA0000EE3FE7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D5E98C082F3FCA0000EE3FE7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D5E98B222F3FB5D900EE3FE7 /* Blackjack 2D */;
+			targetProxy = D5E98C072F3FCA0000EE3FE7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		D5E98B2C2F3FB5D900EE3FE7 /* Debug */ = {
@@ -178,7 +253,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -236,7 +311,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -261,6 +336,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -293,6 +369,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -307,6 +384,53 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D5E98C092F3FCA0000EE3FE7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKWX5MHSVF;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ethangraham.Blackjack-2DTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Blackjack 2D.app/Blackjack 2D";
+			};
+			name = Debug;
+		};
+		D5E98C0A2F3FCA0000EE3FE7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKWX5MHSVF;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ethangraham.Blackjack-2DTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Blackjack 2D.app/Blackjack 2D";
 			};
 			name = Release;
 		};
@@ -327,6 +451,15 @@
 			buildConfigurations = (
 				D5E98B2F2F3FB5D900EE3FE7 /* Debug */,
 				D5E98B302F3FB5D900EE3FE7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D5E98C0B2F3FCA0000EE3FE7 /* Build configuration list for PBXNativeTarget "Blackjack 2DTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5E98C092F3FCA0000EE3FE7 /* Debug */,
+				D5E98C0A2F3FCA0000EE3FE7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

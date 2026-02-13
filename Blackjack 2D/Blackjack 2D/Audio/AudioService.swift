@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import os
 
 protocol AudioService {
     func playSFX(_ key: SFXKey)
@@ -12,6 +13,8 @@ final class DefaultAudioService: AudioService {
     private var musicPlayer: AVAudioPlayer?
     private var sfxPlayers: [SFXKey: AVAudioPlayer] = [:]
     private var settings = GameSettings()
+    private static let logger = Logger(subsystem: "com.ethangraham.Blackjack-2D", category: "audio")
+    private static var missingResources: Set<String> = []
 
     init() {
         configureSession()
@@ -79,6 +82,7 @@ final class DefaultAudioService: AudioService {
 
     private func loadPlayer(resourceName: String, fileExtension: String) -> AVAudioPlayer? {
         guard let url = Bundle.main.url(forResource: resourceName, withExtension: fileExtension) else {
+            logMissingResource("\(resourceName).\(fileExtension)")
             return nil
         }
 
@@ -87,8 +91,14 @@ final class DefaultAudioService: AudioService {
             player.prepareToPlay()
             return player
         } catch {
+            Self.logger.error("Failed to initialize audio resource \(resourceName, privacy: .public).\(fileExtension, privacy: .public): \(String(describing: error), privacy: .public)")
             return nil
         }
+    }
+
+    private func logMissingResource(_ resource: String) {
+        guard Self.missingResources.insert(resource).inserted else { return }
+        Self.logger.warning("Missing audio resource: \(resource, privacy: .public). Gameplay continues with silent fallback.")
     }
 
     private func configureSession() {

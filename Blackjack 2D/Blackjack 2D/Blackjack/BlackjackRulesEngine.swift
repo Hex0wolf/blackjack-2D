@@ -43,6 +43,7 @@ struct StandardBlackjackRulesEngine: BlackjackRulesEngine {
         var updated = context
         updated.phase = .dealerTurn
         updated.dealerHoleCardHidden = false
+        updated.events = []
 
         while shouldDealerDraw(hand: updated.dealerHand) {
             guard let card = updated.drawCard() else { break }

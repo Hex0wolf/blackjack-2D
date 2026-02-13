@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GameScreenView: View {
     @ObservedObject var viewModel: BlackjackViewModel
+    @State private var isDrawerExpanded = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -42,42 +43,27 @@ struct GameScreenView: View {
     }
 
     private var hudPanel: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Button("Menu") {
-                        viewModel.openMenu()
-                    }
-                    .buttonStyle(HUDButtonStyle(color: Color(red: 0.22, green: 0.36, blue: 0.66)))
+        VStack(alignment: .leading, spacing: 10) {
+            primaryHeader
+            phaseStatusPanel
+            controlsPanel
 
-                    Spacer()
-
-                    Text("\(viewModel.phase.rawValue.capitalized)")
-                        .font(.system(size: 15, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(.white.opacity(0.9))
-                }
-
-                Text(viewModel.statusMessage)
-                    .font(.system(size: 16 * viewModel.settings.textScale, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-
-                statsPanel
-                modifierPanel
-                controlsPanel
-
-                if let roundResult = viewModel.roundResult {
-                    resultPanel(result: roundResult)
-                }
-
-                if viewModel.canClaimDailyGrant {
-                    Button("Claim Daily +\(PlayerProfile.dailyGrantAmount)") {
-                        viewModel.claimDailyGrant()
-                    }
-                    .buttonStyle(HUDButtonStyle(color: Color(red: 0.20, green: 0.62, blue: 0.38)))
+            Button(isDrawerExpanded ? "Hide Run Details" : "Show Run Details") {
+                withAnimation(.easeOut(duration: 0.18)) {
+                    isDrawerExpanded.toggle()
                 }
             }
-            .padding(12)
+            .buttonStyle(HUDButtonStyle(color: Color(red: 0.24, green: 0.30, blue: 0.50)))
+
+            if isDrawerExpanded {
+                ScrollView {
+                    drawerPanel
+                }
+                .frame(maxHeight: 240)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
+        .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color.black.opacity(0.35))
@@ -88,14 +74,59 @@ struct GameScreenView: View {
         )
     }
 
+    private var primaryHeader: some View {
+        HStack(spacing: 10) {
+            Button("Menu") {
+                viewModel.openMenu()
+            }
+            .buttonStyle(HUDButtonStyle(color: Color(red: 0.22, green: 0.36, blue: 0.66)))
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("Chips: \(viewModel.profile.chips)")
+                Text("Bet: \(viewModel.adjustedBetPreview)")
+            }
+            .font(.system(size: 14 * viewModel.settings.textScale, weight: .bold, design: .rounded))
+            .foregroundStyle(.white)
+        }
+    }
+
+    private var phaseStatusPanel: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(viewModel.phase.rawValue.uppercased())
+                .font(.system(size: 13, weight: .heavy, design: .monospaced))
+                .foregroundStyle(.white.opacity(0.86))
+            Text(viewModel.snapshot.status)
+                .font(.system(size: 16 * viewModel.settings.textScale, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+        }
+    }
+
+    private var drawerPanel: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            statsPanel
+            modifierPanel
+
+            if let roundResult = viewModel.roundResult {
+                resultPanel(result: roundResult)
+            }
+
+            if viewModel.canClaimDailyGrant {
+                Button("Claim Daily +\(PlayerProfile.dailyGrantAmount)") {
+                    viewModel.claimDailyGrant()
+                }
+                .buttonStyle(HUDButtonStyle(color: Color(red: 0.20, green: 0.62, blue: 0.38)))
+            }
+        }
+    }
+
     private var statsPanel: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Run")
+            Text("Run Details")
                 .font(.system(size: 16, weight: .heavy, design: .monospaced))
                 .foregroundStyle(.white)
 
-            Text("Chips: \(viewModel.profile.chips)")
-                .foregroundStyle(.white)
             Text("Level: \(viewModel.profile.level)  XP: \(viewModel.profile.xp)")
                 .foregroundStyle(.white)
             Text("Streak: \(viewModel.profile.winStreak)  Best: \(viewModel.profile.statistics.bestStreak)")
@@ -129,7 +160,7 @@ struct GameScreenView: View {
 
     private var controlsPanel: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Controls")
+            Text("Legal Actions")
                 .font(.system(size: 16, weight: .heavy, design: .monospaced))
                 .foregroundStyle(.white)
 
@@ -138,15 +169,12 @@ struct GameScreenView: View {
                     Button("-10") { viewModel.changeBet(by: -10) }
                         .buttonStyle(HUDButtonStyle(color: Color(red: 0.40, green: 0.24, blue: 0.24)))
 
-                    VStack(alignment: .leading) {
-                        Text("Base: \(viewModel.baseBet)")
-                        Text("Adjusted: \(viewModel.adjustedBetPreview)")
-                    }
-                    .font(.system(size: 14 * viewModel.settings.textScale, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-
                     Button("+10") { viewModel.changeBet(by: 10) }
                         .buttonStyle(HUDButtonStyle(color: Color(red: 0.20, green: 0.34, blue: 0.22)))
+
+                    Text("Base: \(viewModel.baseBet)")
+                        .font(.system(size: 13 * viewModel.settings.textScale, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.88))
                 }
 
                 Button("Place Bet") {
@@ -160,7 +188,7 @@ struct GameScreenView: View {
                     Text("No legal actions available")
                         .foregroundStyle(.white.opacity(0.8))
                 } else {
-                    HStack(spacing: 8) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 94), spacing: 8)], spacing: 8) {
                         ForEach(viewModel.allowedActions, id: \.self) { action in
                             Button(action.label) {
                                 viewModel.perform(action)
@@ -179,7 +207,7 @@ struct GameScreenView: View {
 
     private func resultPanel(result: RoundResult) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Last Round")
+            Text("Latest Outcome")
                 .font(.system(size: 16, weight: .heavy, design: .monospaced))
                 .foregroundStyle(.white)
             Text("Outcome: \(result.outcome.rawValue.capitalized)")

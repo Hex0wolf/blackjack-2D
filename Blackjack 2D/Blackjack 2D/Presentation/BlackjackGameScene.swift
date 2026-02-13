@@ -1,7 +1,12 @@
 import SpriteKit
+import os
+#if canImport(UIKit)
+import UIKit
+#endif
 
 final class BlackjackGameScene: SKScene {
     private let tableNode = SKShapeNode()
+    private let tableTextureNode = SKSpriteNode()
     private let dealerLabel = SKLabelNode(fontNamed: "Menlo-Bold")
     private let dealerValueLabel = SKLabelNode(fontNamed: "Menlo-Bold")
     private let playerLabel = SKLabelNode(fontNamed: "Menlo-Bold")
@@ -10,6 +15,8 @@ final class BlackjackGameScene: SKScene {
     private let splitValueLabel = SKLabelNode(fontNamed: "Menlo-Bold")
     private let phaseLabel = SKLabelNode(fontNamed: "Menlo-Bold")
     private let statusLabel = SKLabelNode(fontNamed: "Menlo-Bold")
+    private static let logger = Logger(subsystem: "com.ethangraham.Blackjack-2D", category: "assets")
+    private static var missingTextureKeys: Set<String> = []
 
     override init(size: CGSize) {
         super.init(size: size)
@@ -64,6 +71,15 @@ final class BlackjackGameScene: SKScene {
         tableNode.fillColor = SKColor(red: 0.06, green: 0.28, blue: 0.18, alpha: 1)
         addChild(tableNode)
 
+        tableTextureNode.zPosition = -1
+        tableTextureNode.isHidden = true
+        addChild(tableTextureNode)
+
+        if let texture = loadTexture(named: SpriteKey.tableBackground) {
+            tableTextureNode.texture = texture
+            tableTextureNode.isHidden = false
+        }
+
         [dealerLabel, dealerValueLabel, playerLabel, playerValueLabel, splitLabel, splitValueLabel, phaseLabel, statusLabel].forEach {
             $0.fontSize = 26
             $0.fontColor = .white
@@ -78,17 +94,20 @@ final class BlackjackGameScene: SKScene {
     }
 
     private func layoutNodes() {
+        let tableRect = CGRect(
+            x: -size.width * 0.47,
+            y: -size.height * 0.40,
+            width: size.width * 0.94,
+            height: size.height * 0.80
+        )
         tableNode.path = CGPath(
-            roundedRect: CGRect(
-                x: -size.width * 0.47,
-                y: -size.height * 0.40,
-                width: size.width * 0.94,
-                height: size.height * 0.80
-            ),
+            roundedRect: tableRect,
             cornerWidth: 28,
             cornerHeight: 28,
             transform: nil
         )
+        tableTextureNode.position = CGPoint(x: tableRect.midX, y: tableRect.midY)
+        tableTextureNode.size = tableRect.size
 
         dealerLabel.position = CGPoint(x: 0, y: size.height * 0.22)
         dealerValueLabel.position = CGPoint(x: 0, y: size.height * 0.16)
@@ -142,5 +161,20 @@ final class BlackjackGameScene: SKScene {
             SKAction.moveBy(x: amplitude, y: 0, duration: 0.03)
         ])
         run(sequence)
+    }
+
+    private func loadTexture(named key: String) -> SKTexture? {
+        #if canImport(UIKit)
+        guard UIImage(named: key) != nil else {
+            logMissingTexture(key)
+            return nil
+        }
+        #endif
+        return SKTexture(imageNamed: key)
+    }
+
+    private func logMissingTexture(_ key: String) {
+        guard Self.missingTextureKeys.insert(key).inserted else { return }
+        Self.logger.warning("Missing texture key: \(key, privacy: .public). Scene will use shape fallback.")
     }
 }

@@ -25,6 +25,7 @@ final class BlackjackViewModel: ObservableObject {
     private let saveRepository: SaveRepository
     private let audioService: AudioService
     private let hapticService: HapticService
+    private let shoeProvider: any ShoeProviding
 
     private static let minimumBet = 10
     private static let maximumBet = 1_000
@@ -51,13 +52,15 @@ final class BlackjackViewModel: ObservableObject {
         progressionService: DefaultProgressionService,
         saveRepository: SaveRepository,
         audioService: AudioService,
-        hapticService: HapticService
+        hapticService: HapticService,
+        shoeProvider: (any ShoeProviding)? = nil
     ) {
         self.rulesEngine = rulesEngine
         self.progressionService = progressionService
         self.saveRepository = saveRepository
         self.audioService = audioService
         self.hapticService = hapticService
+        self.shoeProvider = shoeProvider ?? RandomShoeProvider()
 
         let loadedSettings = saveRepository.loadSettings()
         var loadedProfile = saveRepository.loadProfile()
@@ -70,7 +73,7 @@ final class BlackjackViewModel: ObservableObject {
         baseBet = initialBet
         selectedModifier = .none
 
-        let initialShoe = DeckFactory.makeShuffledShoe()
+        let initialShoe = self.shoeProvider.makeShoe()
         roundContext = RoundContext.bettingContext(
             shoe: initialShoe,
             bankroll: loadedProfile.chips,
@@ -123,12 +126,12 @@ final class BlackjackViewModel: ObservableObject {
         statusMessage = "Place your bet."
 
         if stateMachine.phase == .idle {
-            _ = stateMachine.transition(to: .betting)
+            transitionTo(.betting)
         } else {
             stateMachine.reset(to: .betting)
+            phase = .betting
         }
 
-        phase = .betting
         roundContext = RoundContext.bettingContext(
             shoe: refreshedShoeIfNeeded(roundContext.shoe),
             bankroll: profile.chips,
@@ -196,19 +199,16 @@ final class BlackjackViewModel: ObservableObject {
             bet: wager
         )
 
-        _ = stateMachine.transition(to: .initialDeal)
-        phase = .initialDeal
+        guard transitionTo(.initialDeal) else { return }
 
         roundResult = nil
         roundContext = rulesEngine.dealInitialCards(context: newContext)
         profile.chips = roundContext.bankroll
 
         if roundContext.phase == .playerTurn {
-            _ = stateMachine.transition(to: .playerTurn)
-            phase = .playerTurn
+            guard transitionTo(.playerTurn) else { return }
         } else if roundContext.phase == .dealerTurn {
-            _ = stateMachine.transition(to: .dealerTurn)
-            phase = .dealerTurn
+            guard transitionTo(.dealerTurn) else { return }
         }
 
         applyRoundEvents(roundContext.events)
@@ -229,8 +229,7 @@ final class BlackjackViewModel: ObservableObject {
         roundContext = rulesEngine.apply(action: action, context: roundContext)
 
         if roundContext.phase == .dealerTurn {
-            _ = stateMachine.transition(to: .dealerTurn)
-            phase = .dealerTurn
+            guard transitionTo(.dealerTurn) else { return }
             applyRoundEvents(roundContext.events)
             refreshSnapshot(with: roundContext.events)
             resolveDealerAndSettleRound()
@@ -321,10 +320,14 @@ final class BlackjackViewModel: ObservableObject {
         isInputLocked = true
 
         roundContext = rulesEngine.playDealerTurn(context: roundContext)
-        applyRoundEvents(roundContext.events)
+        let dealerEvents = roundContext.events
+        applyRoundEvents(dealerEvents)
 
-        _ = stateMachine.transition(to: .settle)
-        phase = .settle
+        guard transitionTo(.settle) else {
+            isInputLocked = false
+            return
+        }
+        roundContext.phase = .settle
 
         let result = rulesEngine.resolveRound(context: roundContext)
         roundResult = result
@@ -339,17 +342,25 @@ final class BlackjackViewModel: ObservableObject {
         )
         profile = progression.profile
 
-        let allEvents = roundContext.events + result.eventList + progression.events
-        applyRoundEvents(allEvents)
+        let settleEvents = result.eventList + progression.events
+        applyRoundEvents(settleEvents)
 
-        _ = stateMachine.transition(to: .rewards)
-        phase = .rewards
+        guard transitionTo(.rewards) else {
+            isInputLocked = false
+            return
+        }
+        roundContext.phase = .rewards
 
-        _ = stateMachine.transition(to: .nextRound)
-        phase = .nextRound
+        guard transitionTo(.nextRound) else {
+            isInputLocked = false
+            return
+        }
+        roundContext.phase = .nextRound
 
-        _ = stateMachine.transition(to: .betting)
-        phase = .betting
+        guard transitionTo(.betting) else {
+            isInputLocked = false
+            return
+        }
 
         roundContext = RoundContext.bettingContext(
             shoe: refreshedShoeIfNeeded(roundContext.shoe),
@@ -362,7 +373,7 @@ final class BlackjackViewModel: ObservableObject {
 
         statusMessage = messageFor(result: result)
         persistProfileAndSettings()
-        refreshSnapshot(with: allEvents)
+        refreshSnapshot(with: dealerEvents + settleEvents)
 
         isInputLocked = false
     }
@@ -375,9 +386,20 @@ final class BlackjackViewModel: ObservableObject {
 
     private func refreshedShoeIfNeeded(_ current: [Card]) -> [Card] {
         if current.count < 40 {
-            return DeckFactory.makeShuffledShoe()
+            return shoeProvider.makeShoe()
         }
         return current
+    }
+
+    @discardableResult
+    private func transitionTo(_ newPhase: GamePhase) -> Bool {
+        guard stateMachine.transition(to: newPhase) else {
+            assertionFailure("Invalid phase transition from \(stateMachine.phase.rawValue) to \(newPhase.rawValue)")
+            return false
+        }
+
+        phase = newPhase
+        return true
     }
 
     private func applyRoundEvents(_ events: [RoundEvent]) {
