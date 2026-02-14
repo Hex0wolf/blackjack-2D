@@ -40,16 +40,15 @@ final class BlackjackGameScene: SKScene {
     }
 
     func render(snapshot: GameSnapshot) {
-        dealerLabel.text = "Dealer: \(snapshot.dealerCards)"
-        dealerValueLabel.text = "Value: \(snapshot.dealerValue)"
+        dealerLabel.text = "Dealer: \(snapshot.table.dealer.cardsText)"
+        dealerValueLabel.text = "Value: \(snapshot.table.dealer.valueText)"
 
-        playerLabel.text = "Player: \(snapshot.playerCards)"
-        playerValueLabel.text = "Value: \(snapshot.playerValue)"
+        playerLabel.text = "Player: \(snapshot.table.player.cardsText)"
+        playerValueLabel.text = "Value: \(snapshot.table.player.valueText)"
 
-        if let splitCards = snapshot.splitCards,
-           let splitValue = snapshot.splitValue {
-            splitLabel.text = "Split: \(splitCards)"
-            splitValueLabel.text = "Value: \(splitValue)"
+        if let split = snapshot.table.split {
+            splitLabel.text = "Split: \(split.cardsText)"
+            splitValueLabel.text = "Value: \(split.valueText)"
             splitLabel.alpha = 1
             splitValueLabel.alpha = 1
         } else {
@@ -59,10 +58,10 @@ final class BlackjackGameScene: SKScene {
             splitValueLabel.alpha = 0
         }
 
-        phaseLabel.text = "Phase: \(snapshot.phase.rawValue.uppercased())"
-        statusLabel.text = snapshot.status
+        phaseLabel.text = "Phase: \(snapshot.table.phase.rawValue.uppercased())"
+        statusLabel.text = snapshot.table.status
 
-        applyEventEffects(snapshot.recentEvents)
+        applyEventEffects(snapshot.table.recentEvents)
     }
 
     private func setupNodes() {

@@ -7,15 +7,16 @@ It is grounded in current repo state:
 1. Core gameplay loop exists and builds successfully.
 2. UI currently violates the minimal-HUD requirement.
 3. SpriteKit scene is label/text-based, not sprite-card/table based.
-4. No test target currently exists.
-5. Deployment target is currently iOS 26.2 and will be aligned to iOS 17.0.
+4. XCTest target exists with unit, smoke, and integration coverage.
+5. Deployment target is aligned to iOS 17.0.
 
 ## Phase Plan
 
-## Current Status (as of February 13, 2026)
+## Current Status (as of February 14, 2026)
 1. Phase 1: Completed
 2. Phase 2: Completed
-3. Phase 3-8: Pending
+3. Phase 3: Completed
+4. Phase 4-8: Pending
 ### 1. Phase 1: Foundation and Compatibility Lock (Completed)
 Goal: align project baseline and create scaffolding for safe incremental delivery.
 
@@ -44,7 +45,7 @@ Exit criteria:
 2. Deterministic full-round integration tests pass.
 3. No regressions in current play loop.
 
-### 3. Phase 3: Presentation Contract Refactor
+### 3. Phase 3: Presentation Contract Refactor (Completed)
 Goal: decouple UI from string-rendered cards and prep sprite-first rendering.
 
 Implementation:
@@ -56,6 +57,12 @@ Exit criteria:
 1. App behavior unchanged from user perspective.
 2. Snapshot tests for portrait/landscape data shape.
 3. No direct `Hand.rendered()` dependency in scene layer.
+
+Completion notes:
+1. Added typed render models: `CardRenderModel`, `HandRenderModel`, `TableRenderModel`.
+2. Updated `BlackjackViewModel` to emit typed snapshot data.
+3. Kept compatibility adapter on `GameSnapshot` and stable `GameSceneView` API.
+4. Added snapshot-shape tests and validated suite pass via `xcodebuild test`.
 
 ### 4. Phase 4: SpriteKit Table/Card Scene Upgrade
 Goal: replace label-only table with animated card/table/chip scene.

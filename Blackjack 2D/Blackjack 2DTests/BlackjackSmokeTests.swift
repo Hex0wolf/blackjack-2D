@@ -92,4 +92,58 @@ final class BlackjackSmokeTests: XCTestCase {
         XCTAssertFalse(machine.transition(to: .dealerTurn))
         XCTAssertEqual(machine.phase, .betting)
     }
+
+    func testTypedSnapshotDataShapeWithHiddenDealerCard() {
+        let snapshot = GameSnapshot(
+            table: TableRenderModel(
+                phase: .playerTurn,
+                dealer: HandRenderModel(
+                    cards: [.faceUp(TestFixtures.card(.ten, .spades)), .hidden],
+                    valueText: "?",
+                    isActive: false
+                ),
+                player: HandRenderModel(
+                    cards: [
+                        .faceUp(TestFixtures.card(.nine, .clubs)),
+                        .faceUp(TestFixtures.card(.six, .diamonds))
+                    ],
+                    valueText: "15",
+                    isActive: true
+                ),
+                split: nil,
+                activeHand: .primary,
+                status: "Main Hand: choose your action",
+                recentEvents: [.cardDealt]
+            )
+        )
+
+        XCTAssertEqual(snapshot.table.phase, .playerTurn)
+        XCTAssertEqual(snapshot.table.dealer.cards.count, 2)
+        XCTAssertTrue(snapshot.table.dealer.cards[1].isFaceDown)
+        XCTAssertEqual(snapshot.dealerCards, "10♠ ??")
+        XCTAssertEqual(snapshot.playerCards, "9♣ 6♦")
+        XCTAssertNil(snapshot.splitCards)
+    }
+
+    func testLegacySnapshotInitializerAdaptsToTypedModel() {
+        let snapshot = GameSnapshot(
+            phase: .playerTurn,
+            dealerCards: "10♠ ??",
+            dealerValue: "?",
+            playerCards: "8♥ 8♦",
+            playerValue: "16",
+            splitCards: "K♣",
+            splitValue: "10",
+            activeHand: .split,
+            status: "Split hand active",
+            recentEvents: [.cardDealt]
+        )
+
+        XCTAssertEqual(snapshot.table.dealer.cards.count, 2)
+        XCTAssertTrue(snapshot.table.dealer.cards[1].isFaceDown)
+        XCTAssertEqual(snapshot.table.player.cards.count, 2)
+        XCTAssertEqual(snapshot.table.split?.cards.count, 1)
+        XCTAssertEqual(snapshot.table.activeHand, .split)
+        XCTAssertEqual(snapshot.dealerCards, "10♠ ??")
+    }
 }

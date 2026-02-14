@@ -437,32 +437,54 @@ final class BlackjackViewModel: ObservableObject {
     }
 
     private func refreshSnapshot(with events: [RoundEvent]) {
-        let dealerCards = roundContext.dealerHand.rendered(hidingSecondCard: roundContext.dealerHoleCardHidden)
-        let dealerValue: String
-        if roundContext.dealerHand.cards.isEmpty {
-            dealerValue = "--"
-        } else if roundContext.dealerHoleCardHidden,
-           roundContext.dealerHand.cards.count > 1 {
-            dealerValue = "?"
-        } else {
-            dealerValue = "\(roundContext.dealerHand.bestValue)"
+        let status = statusForCurrentState()
+        let recentEvents = Array(events.suffix(3))
+
+        let dealerCards = roundContext.dealerHand.cards.enumerated().map { index, card in
+            if roundContext.dealerHoleCardHidden && index == 1 {
+                return CardRenderModel.hidden
+            }
+            return CardRenderModel.faceUp(card)
         }
 
-        let split = roundContext.splitHand
-        let status = statusForCurrentState()
+        let dealerValueText: String
+        if roundContext.dealerHand.cards.isEmpty {
+            dealerValueText = "--"
+        } else if roundContext.dealerHoleCardHidden && roundContext.dealerHand.cards.count > 1 {
+            dealerValueText = "?"
+        } else {
+            dealerValueText = "\(roundContext.dealerHand.bestValue)"
+        }
 
-        snapshot = GameSnapshot(
+        let playerHand = HandRenderModel(
+            cards: roundContext.playerHand.cards.map(CardRenderModel.faceUp),
+            valueText: "\(roundContext.playerHand.bestValue)",
+            isActive: roundContext.activeHand == .primary
+        )
+
+        let splitHand = roundContext.splitHand.map { split in
+            HandRenderModel(
+                cards: split.cards.map(CardRenderModel.faceUp),
+                valueText: "\(split.bestValue)",
+                isActive: roundContext.activeHand == .split
+            )
+        }
+
+        let table = TableRenderModel(
             phase: phase,
-            dealerCards: dealerCards,
-            dealerValue: dealerValue,
-            playerCards: roundContext.playerHand.rendered(),
-            playerValue: "\(roundContext.playerHand.bestValue)",
-            splitCards: split?.rendered(),
-            splitValue: split.map { "\($0.bestValue)" },
+            dealer: HandRenderModel(
+                cards: dealerCards,
+                valueText: dealerValueText,
+                isActive: false
+            ),
+            player: playerHand,
+            split: splitHand,
             activeHand: roundContext.activeHand,
             status: status,
-            recentEvents: Array(events.suffix(3))
+            recentEvents: recentEvents
         )
+
+        snapshot = GameSnapshot(table: table)
     }
 
     private func statusForCurrentState() -> String {
